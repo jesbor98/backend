@@ -23,20 +23,23 @@ public class Client {
         }
     }
 
-//    public Client() {
-//        this.host = "127.0.0.1";;
-//        this.port = 2000;
-//    }
-//
-//    public Client(String host) {
-//        this.host = host;
-//        this.port = 2000;
-//    }
-//
-//    public Client(String host, int port) {
-//        this.host = host;
-//        this.port = port;
-//    }
+    public Client() throws IOException {
+        this.host = "127.0.0.1";;
+        this.port = 2000;
+        this.socket = new Socket(host, port);
+    }
+
+    public Client(String host) throws IOException {
+        this.host = host;
+        this.port = 2000;
+        this.socket = new Socket(host, port);
+    }
+
+    public Client(String host, int port) throws IOException {
+        this.host = host;
+        this.port = port;
+        this.socket = new Socket(host, port);
+    }
 
     public void sendMessage() {
         try {
