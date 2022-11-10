@@ -1,3 +1,5 @@
+package uppgift1;
+
 /**
  * @author Jessica Borg
  * Program which uses multithreading to demonstrate uses of multiple execution of code.

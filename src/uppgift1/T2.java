@@ -1,3 +1,5 @@
+package uppgift1;
+
 public class T2 implements Runnable{
 
     public void run() {
@@ -11,4 +13,3 @@ public class T2 implements Runnable{
         }
     }
 }
-

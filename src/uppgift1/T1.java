@@ -1,3 +1,4 @@
+package uppgift1;
 
 public class T1 extends Thread {
 
@@ -13,4 +14,3 @@ public class T1 extends Thread {
         }
     }
 }
-
