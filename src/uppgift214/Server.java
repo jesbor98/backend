@@ -17,12 +17,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server extends Application {
     private BorderPane root = new BorderPane();
+    private Scene scene = new Scene(root, 400, 400);
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -31,19 +33,23 @@ public class Server extends Application {
         root.setCenter(label);
         root.setVisible(true);
 
-        ServerSocket serverSocket = new ServerSocket(4848);
+        stage.setScene(scene);
+        stage.show();
+
+        ServerSocket serverSocket = new ServerSocket(4000);
         Socket socket = serverSocket.accept();
         InputStream inputStream = socket.getInputStream(); //read info from client
 
         //Buffer the inputImage received:
         BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
         BufferedImage bufferedImage = ImageIO.read(bufferedInputStream); //image to display
-
+        Image image = SwingFXUtils.toFXImage(convertBufferedImage(bufferedImage, bufferedImage.TYPE_4BYTE_ABGR), null);
         //bufferedInputStream.close();
         //socket.close();
 
         Label labelPicture = new Label();
-        ImageView imageView = new ImageView(convertBufferedImage(bufferedImage)); //convert buffImage -> Image
+        ImageView imageView = new ImageView(image);
+        //ImageView imageView = new ImageView(convertBufferedImage(bufferedImage)); //convert buffImage -> Image
         labelPicture.setGraphic(imageView);
         label.setText("Image received");
         root.setCenter(labelPicture);
@@ -52,10 +58,14 @@ public class Server extends Application {
         top.setAlignment(Pos.CENTER);
         top.setPrefWidth(400);
         root.setTop(top);
+    }
 
-        Scene scene = new Scene(root, 400, 400);
-        stage.setScene(scene);
-        stage.show();
+    public BufferedImage convertBufferedImage(BufferedImage image, int type) {
+        BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(), type);
+        Graphics2D graphics = bufferedImage.createGraphics();
+        graphics.drawImage(image, 0, 0, null);
+        graphics.dispose();
+        return bufferedImage;
     }
 
     public Image convertBufferedImage(BufferedImage bufferedImage) {
