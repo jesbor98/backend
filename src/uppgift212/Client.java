@@ -25,23 +25,23 @@ public class Client {
         }
     }
 
-    public Client() throws IOException {
-        this.host = "127.0.0.1";;
-        this.port = 2000;
-        this.socket = new Socket(host, port);
-    }
-
-    public Client(String host) throws IOException {
-        this.host = host;
-        this.port = 2000;
-        this.socket = new Socket(host, port);
-    }
-
-    public Client(String host, int port) throws IOException {
-        this.host = host;
-        this.port = port;
-        this.socket = new Socket(host, port);
-    }
+//    public Client() throws IOException {
+//        this.host = "127.0.0.1";;
+//        this.port = 2001;
+//        this.socket = new Socket(host, port);
+//    }
+//
+//    public Client(String host) throws IOException {
+//        this.host = host;
+//        this.port = 2001;
+//        this.socket = new Socket(host, port);
+//    }
+//
+//    public Client(String host, int port) throws IOException {
+//        this.host = host;
+//        this.port = port;
+//        this.socket = new Socket(host, port);
+//    }
 
     public void sendMessage() {
         try {
@@ -102,7 +102,7 @@ public class Client {
         System.out.println("Enter username for the chat: ");
         String username = scanner.nextLine();
         //1st: IP-adress to connect to, 2nd: port to connect to
-        Socket socket = new Socket("localhost", 2000);
+        Socket socket = new Socket("localhost", 1999);
 
         Client client = new Client(socket, username);
         client.listenForMessage();
