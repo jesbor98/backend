@@ -29,12 +29,13 @@ public class Server {
             while(!serverSocket.isClosed()) { //waiting for a client to connect while open
                 Socket socket = serverSocket.accept();
                 System.out.println("A new client has connected!");
-                ClientManager clientHandler = new ClientManager(socket); //implements Runnable
+                ClientManager clientManager = new ClientManager(socket); //implements Runnable
 
-                Thread thread = new Thread(clientHandler);
+                Thread thread = new Thread(clientManager);
                 thread.start();
             }
         } catch (IOException e) {
+
 
         }
     }
