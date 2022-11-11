@@ -30,7 +30,7 @@ public class Client extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Socket socket = new Socket("atlas.dsv.su.se", 4848);
+        Socket socket = new Socket("localhost", 4000);
         System.out.println("Connected to server");
 
         Label top = new Label("Client");
@@ -46,6 +46,8 @@ public class Client extends Application {
 
         Image image = new Image("file:C:/Users/jessi/bart.png"); //url till bild
         ImageView imageView = new ImageView(image);
+        //imageView.setFitWidth(100); imageView.setFitHeight(100);
+        imageView.setPreserveRatio(true);
         root.setCenter(imageView);
         //root.getChildren().add(imageView);
 
