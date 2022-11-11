@@ -51,7 +51,7 @@ public class Server {
     }
 
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(2001);
+        ServerSocket serverSocket = new ServerSocket(2000);
         Server server = new Server(serverSocket);
         server.startServer();
     }

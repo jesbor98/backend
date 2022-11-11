@@ -17,7 +17,7 @@ public class Server {
 
         ServerSocket ss = null;
 
-        ss = new ServerSocket(2000);
+        ss = new ServerSocket(2001);
 
         while(true) {
             try {
