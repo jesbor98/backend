@@ -1,9 +1,11 @@
 package uppgift214;
 
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -32,24 +34,16 @@ public class Server extends Application {
         ServerSocket serverSocket = new ServerSocket(4848);
         Socket socket = serverSocket.accept();
         InputStream inputStream = socket.getInputStream(); //read info from client
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 
-        // Converting buffered image to java FX link:
-        // https://blog.idrsolutions.com/2012/11/convert-bufferedimage-to-javafx-image/
+        //Buffer the inputImage received:
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
         BufferedImage bufferedImage = ImageIO.read(bufferedInputStream); //image to display
-        WritableImage writableImage = new WritableImage(bufferedImage.getHeight(),
-                bufferedImage.getWidth());
-        PixelWriter pixelWriter = writableImage.getPixelWriter();
-        for (int x = 0; x<bufferedImage.getWidth(); x++) {
-            for (int y = 0; y<bufferedImage.getHeight(); y++) {
-                pixelWriter.setArgb(x, y, bufferedImage.getRGB(x, y));
-            }
-        }
-        bufferedInputStream.close();
-        socket.close();
+
+        //bufferedInputStream.close();
+        //socket.close();
 
         Label labelPicture = new Label();
-        ImageView imageView = new ImageView(writableImage);
+        ImageView imageView = new ImageView(convertBufferedImage(bufferedImage)); //convert buffImage -> Image
         labelPicture.setGraphic(imageView);
         label.setText("Image received");
         root.setCenter(labelPicture);
@@ -62,6 +56,19 @@ public class Server extends Application {
         Scene scene = new Scene(root, 400, 400);
         stage.setScene(scene);
         stage.show();
+    }
+
+    public Image convertBufferedImage(BufferedImage bufferedImage) {
+        WritableImage writableImage = new WritableImage(bufferedImage.getHeight(),
+                bufferedImage.getWidth());
+        PixelWriter pixelWriter = writableImage.getPixelWriter();
+        for (int x = 0; x<bufferedImage.getWidth(); x++) {
+            for (int y = 0; y<bufferedImage.getHeight(); y++) {
+                pixelWriter.setArgb(x, y, bufferedImage.getRGB(x, y));
+            }
+        }
+        Image image = new ImageView(writableImage).getImage();
+        return image;
     }
 
     public static void main(String[] args) {
