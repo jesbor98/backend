@@ -58,6 +58,7 @@ public class Server extends Application {
         top.setAlignment(Pos.CENTER);
         top.setPrefWidth(400);
         root.setTop(top);
+        root.setVisible(true);
     }
 
     public BufferedImage convertBufferedImage(BufferedImage image, int type) {

@@ -4,16 +4,17 @@ import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
@@ -46,11 +47,11 @@ public class Client extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+
         DatagramSocket datagramSocket = new DatagramSocket();
         InetAddress inetAddress = InetAddress.getByName("localhost");
-        Client client = new Client(datagramSocket, inetAddress);
         System.out.println("Draw whatever you want!");
-        client.send();
+        //Client client = new Client(datagramSocket, inetAddress);
 
         Label top = new Label("The online Whiteboard!");
         top.setAlignment(Pos.CENTER);
@@ -58,21 +59,36 @@ public class Client extends Application {
         root.setTop(top);
         root.setVisible(true);
 
-
+        Scene scene = new Scene(root, 400, 400);
+        stage.setScene(scene);
+        stage.show();
     }
 
-
-    public void send() { //maybe implements Runnable instead since it always should run
+    public void sendThenReceive() {
+        //Scanner scanner = new Scanner(System.in);
         while(true) {
+            try {
+               // String messageToSend = scanner.nextLine();
+               // buffer = messageToSend.getBytes();
+                DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length, inetAddress, 2000);
+                datagramSocket.send(datagramPacket);
+                datagramSocket.receive(datagramPacket);
 
+                String messageFromServer = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+                System.out.println(messageFromServer);
+            } catch (IOException e) {
+                e.printStackTrace();
+                break;
+            }
         }
     }
 
-    class DrawHandler extends BorderPane implements EventHandler<MouseEvent> {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
+    public void draw(Canvas canvas) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+    }
 
-        }
+    public static void main(String[] args) {
+        launch(args);
     }
 
 
