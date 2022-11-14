@@ -37,6 +37,7 @@ public class Client extends Application {
 
     //COORDINATES FOR DRAWING:
     private Point point;
+    private double x, y;
 
     //CLIENT OBJECT:
     public Client(DatagramSocket datagramSocket, InetAddress inetAddress) {
@@ -58,9 +59,36 @@ public class Client extends Application {
         root.setTop(top);
         root.setVisible(true);
 
+        //While true:
+        root.setOnMousePressed(new DrawStart());
+        root.setOnMouseDragged(new DrawHandler());
+
         Scene scene = new Scene(root, 400, 400);
         stage.setScene(scene);
         stage.show();
+
+    }
+
+    class DrawStart implements EventHandler<MouseEvent> {
+        @Override
+        public void handle(MouseEvent mouseEvent) {
+            x = mouseEvent.getX();
+            y = mouseEvent.getY();
+        }
+    }
+
+    class DrawHandler implements EventHandler<MouseEvent> {
+        @Override
+        public void handle(MouseEvent mouseEvent) {
+            double newX = root.getLayoutX() + mouseEvent.getX() - x;
+            double newY = root.getLayoutY() + mouseEvent.getY() - y;
+            root.relocate(newX, newY);
+        }
+    }
+
+    public void receivePoint(String message) {
+        String[] xy = message.split(" ");
+        Point p = new Point(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
     }
 
     public void sendThenReceive() {
@@ -83,7 +111,8 @@ public class Client extends Application {
     }
 
     public String pointToString(Point p) {
-        String message = Integer.toString((int) p.getX()) + " " + Integer.toString((int) p.getY());
+        String message = (int) p.getX() + " " + ((int) p.getY());
+        System.out.println(message);
         return message;
     }
 
@@ -92,8 +121,9 @@ public class Client extends Application {
     }
 
     public static void main(String[] args) {
+
         launch(args);
     }
 
-
 }
+
