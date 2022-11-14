@@ -13,6 +13,10 @@ public class Point extends BorderPane {
         setOnMouseDragged(new DrawHandler());
     }
 
+    public double getX() {return x;}
+
+    public double getY() {return y;}
+
     class DrawHandler implements EventHandler<MouseEvent> {
         @Override
         public void handle(MouseEvent mouseEvent) {

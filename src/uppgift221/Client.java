@@ -36,8 +36,7 @@ public class Client extends Application {
     private Button button;
 
     //COORDINATES FOR DRAWING:
-    private float x;
-    private float y;
+    private Point point;
 
     //CLIENT OBJECT:
     public Client(DatagramSocket datagramSocket, InetAddress inetAddress) {
@@ -68,8 +67,8 @@ public class Client extends Application {
         //Scanner scanner = new Scanner(System.in);
         while(true) {
             try {
-               // String messageToSend = scanner.nextLine();
-               // buffer = messageToSend.getBytes();
+                String messageToSend = pointToString(point);
+                buffer = messageToSend.getBytes();
                 DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length, inetAddress, 2000);
                 datagramSocket.send(datagramPacket);
                 datagramSocket.receive(datagramPacket);
@@ -81,6 +80,11 @@ public class Client extends Application {
                 break;
             }
         }
+    }
+
+    public String pointToString(Point p) {
+        String message = Integer.toString((int) p.getX()) + " " + Integer.toString((int) p.getY());
+        return message;
     }
 
     public void draw(Canvas canvas) {
