@@ -110,10 +110,11 @@ public class Client extends Application {
         }
     }
 
+
     public String pointToString(Point p) {
-        String message = (int) p.getX() + " " + ((int) p.getY());
-        System.out.println(message);
-        return message;
+        String point = (int) p.getX() + " " + ((int) p.getY());
+        System.out.println(point);
+        return point;
     }
 
     public void draw(Canvas canvas) {
