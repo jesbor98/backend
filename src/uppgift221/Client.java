@@ -17,6 +17,7 @@ import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.HashSet;
 
 public class Client extends Application {
 
@@ -60,8 +61,8 @@ public class Client extends Application {
         root.setVisible(true);
 
         //While true:
-        root.setOnMousePressed(new DrawStart());
-        root.setOnMouseDragged(new DrawHandler());
+        root.setOnMousePressed(new MouseStart());
+        root.setOnMouseDragged(new MouseDragged());
 
         Scene scene = new Scene(root, 400, 400);
         stage.setScene(scene);
@@ -69,7 +70,7 @@ public class Client extends Application {
 
     }
 
-    class DrawStart implements EventHandler<MouseEvent> {
+    class MouseStart implements EventHandler<MouseEvent> {
         @Override
         public void handle(MouseEvent mouseEvent) {
             x = mouseEvent.getX();
@@ -77,7 +78,7 @@ public class Client extends Application {
         }
     }
 
-    class DrawHandler implements EventHandler<MouseEvent> {
+    class MouseDragged implements EventHandler<MouseEvent> {
         @Override
         public void handle(MouseEvent mouseEvent) {
             double newX = root.getLayoutX() + mouseEvent.getX() - x;
@@ -87,8 +88,12 @@ public class Client extends Application {
     }
 
     public void receivePoint(String message) {
+        HashSet<Point> set = new HashSet<>();
         String[] xy = message.split(" ");
-        Point p = new Point(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
+        for(int i = 0 ; i<message.length(); i++) {
+            Point p = new Point(Integer.parseInt(xy[i]), Integer.parseInt(xy[i+1]));
+            set.add(p);
+        }
     }
 
     public void sendThenReceive() {
