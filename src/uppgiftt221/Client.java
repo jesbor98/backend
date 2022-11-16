@@ -1,6 +1,7 @@
 package uppgiftt221;
 
 import javafx.application.Application;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
 
 import java.awt.*;
@@ -17,26 +18,30 @@ public class Client implements Runnable{
     private Whiteboard whiteboard;
     //private Thread thread = new Thread(this);
 
-    public Client(DatagramSocket datagramSocket, InetAddress inetAddress, Whiteboard whiteboard) {
+    public Client(DatagramSocket datagramSocket, InetAddress inetAddress) {
         this.datagramSocket = datagramSocket;
         this.inetAddress = inetAddress;
         this.whiteboard = whiteboard;
     }
 
-    public void sendPoint(Point p) {
-        String point = Integer.toString(p.x) + " " + Integer.toString(p.y);
-        buffer = point.getBytes(StandardCharsets.UTF_8); //ha detta?
-       /* try {
-           // InetAddress inetAddress = InetAddress.getByName(host);
-            //DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length, inetAddress, port);
-           // datagramSocket.send(datagramPacket);
-        } catch (SocketException e) {
-            e.printStackTrace();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+    public void sendThenReceive() {
+        Whiteboard whiteboard = new Whiteboard(); //denna vill jag ska ta
+        while(true) {
+            try {
+                GraphicsContext drawingToSend = whiteboard.getGraphicsContext();
+                String graphicsContext = drawingToSend.toString();
+                buffer = graphicsContext.getBytes();
+                DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length, inetAddress, 2000);
+                datagramSocket.send(datagramPacket);
+                datagramSocket.receive(datagramPacket);
+
+                String drawingFromServer = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+                System.out.println(drawingFromServer);
+            } catch (IOException e) {
+                e.printStackTrace();
+                break;
+            }
+        }
     }
 
     @Override
@@ -55,7 +60,7 @@ public class Client implements Runnable{
 
         DatagramSocket datagramSocket = new DatagramSocket();
         InetAddress inetAddress = InetAddress.getByName("localhost");
-        //Client client = new Client(datagramSocket, inetAddress);
+        Client client = new Client(datagramSocket, inetAddress);
         System.out.println("Send datagram packet to a server");
         //client.sendThenReceive();
     }

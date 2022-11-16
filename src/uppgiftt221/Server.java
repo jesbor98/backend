@@ -39,22 +39,19 @@ public class Server implements Runnable{
                 int p1 = Integer.parseInt(point[0].trim());
                 int p2 = Integer.parseInt(point[1].trim());
 
-                Point p = new Point(p1, p2);
+                datagramPacket = new DatagramPacket(buffer, buffer.length, inetAddress, port);
+                datagramSocket.send(datagramPacket);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
     }
-    public void start(Stage s) {
-        Pane pane = new Pane();
-        Scene addFrame = new Scene(pane, 800, 500);
-        s.setScene(addFrame);
-        s.show();
-    }
 
     public static void main(String[] args) throws SocketException {
-        DatagramSocket datagramSocket = new DatagramSocket();
+        DatagramSocket datagramSocket = new DatagramSocket(2000);
+        Server server = new Server(datagramSocket);
+        server.run();
 
         Application.launch(Whiteboard.class, args);
     }

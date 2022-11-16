@@ -97,6 +97,10 @@ public class Whiteboard extends Application {
         stage.show();
     }
 
+    public GraphicsContext getGraphicsContext() {
+        return graphicsContext;
+    }
+
 
     class MouseStart implements EventHandler<MouseEvent> {
         @Override
