@@ -5,6 +5,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
+//Contains sketching information from client -> server!
 public class WhiteboardMessage {
 
     private Point2D point2D; //point to be sketch
@@ -13,6 +14,7 @@ public class WhiteboardMessage {
     private EventType<MouseEvent> mouseEvent; //mouse pressed & mouse dragged
 
     //constructor:
+    //tar in och omvandlar till message:
     public WhiteboardMessage(Point2D point2D, Color color, int size, EventType<MouseEvent> mouseEvent) {
         this.point2D = point2D;
         this.color = color;
@@ -27,4 +29,5 @@ public class WhiteboardMessage {
     public int getSize(){return size;}
 
     public EventType<MouseEvent> getMouseEvent() {return mouseEvent;}
+
 }
