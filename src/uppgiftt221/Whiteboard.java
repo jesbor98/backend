@@ -17,8 +17,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import uppgift221.Client;
-import uppgift221.Point;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
