@@ -1,33 +1,26 @@
 package whiteboard221;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import uppgift221.Client;
-import uppgift221.Point;
 
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.net.SocketException;
 
-public class WhiteboardJavaFX extends Application {
+public class Whiteboard extends Application {
 
     private Canvas canvas;
     private Color color;
+    private WhiteboardClient client;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -45,11 +38,13 @@ public class WhiteboardJavaFX extends Application {
     public HBox getHboxv1(Canvas canvas) {
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, e-> {
-            try {pointSketch(new Point2D(e.getX(), e.getY()), MouseEvent.MOUSE_PRESSED);
+            try {
+                draw(new Point2D(e.getX(), e.getY()), MouseEvent.MOUSE_PRESSED);
             } catch (Exception exception) {exception.printStackTrace();}
         });
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, e-> {
-            try {pointSketch(new Point2D(e.getX(), e.getY()), MouseEvent.MOUSE_DRAGGED);
+            try {
+                draw(new Point2D(e.getX(), e.getY()), MouseEvent.MOUSE_DRAGGED);
             } catch (Exception exception) {exception.printStackTrace();}
         });
         graphicsContext.setLineWidth(5);
@@ -68,20 +63,20 @@ public class WhiteboardJavaFX extends Application {
             graphicsContext.setStroke(color);
         });
 
-        Button button = new Button("Eraser");
+        Button button = new Button("Erase");
         button.setOnAction(e-> {
-            if(button.getText().equals("Eraser")) {
+            if(button.getText().equals("Erase")) {
                 color = Color.WHITE; //sudda
                 graphicsContext.setStroke(color);
                 colorPicker.setVisible(false);
-                button.setText("Sketch");
+                button.setText("Draw");
                 graphicsContext.setLineWidth(30);
                 canvas.setCursor(Cursor.TEXT);
             } else {
                 color = colorPicker.getValue();
                 graphicsContext.setStroke(color);
                 colorPicker.setVisible(true);
-                button.setText("Eraser");
+                button.setText("Erase");
                 graphicsContext.setLineWidth(5);
                 canvas.setCursor(Cursor.DEFAULT);
             }
@@ -94,13 +89,20 @@ public class WhiteboardJavaFX extends Application {
 
     }
 
-    public void pointSketch(Point2D point2D, EventType<MouseEvent> mouseEventEventType) {
+    //Beroende på om man valt sudd/drawing:
+    public void draw(Point2D point2D, EventType<MouseEvent> mouseEvent) {
         WhiteboardMessage message = null;
-        if(this.color == Color.WHITE) message = new WhiteboardMessage(point2D, color, 50, mouseEventEventType);
-        else message = new WhiteboardMessage(point2D, color, 5, mouseEventEventType);
+        if(this.color == Color.WHITE) message = new WhiteboardMessage(point2D, color, 50, mouseEvent);
+        else message = new WhiteboardMessage(point2D, color, 5, mouseEvent);
         messageWhiteboard(message);
+        /*try {
+            client.sendDrawing(message, canvas);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }*/
     }
 
+    //Här är när man ritar på whiteboard:
     public void messageWhiteboard(WhiteboardMessage message) {
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         if(message.getMouseEvent().equals(MouseEvent.MOUSE_PRESSED)) {
@@ -110,22 +112,11 @@ public class WhiteboardJavaFX extends Application {
             graphicsContext.setLineWidth(message.getSize());
             graphicsContext.setStroke(message.getColor());
             graphicsContext.lineTo(message.getPoint2D().getX(), message.getPoint2D().getY());
-            graphicsContext.stroke();
+            graphicsContext.stroke(); //stroke -> graphiccontext
         }
     }
 
-
-    public void whiteboardPoint(Point2D point, EventType<MouseEvent> mouseEventEvent) {
-        WhiteboardMessage whiteboardMessage = null; //send this
-        //if(this.color)
-    }
-
-
-    public void getPoints() {
-
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SocketException {
         launch(args);
     }
 }
