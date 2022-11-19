@@ -1,5 +1,10 @@
 package uppgift211;
-
+/**
+ * This class act as a Server which a Client connects to by a Stream Socket connection. When connected the class
+ * receives messages sent from the Client and confirms back to the Client what message was sent.
+ *
+ * @author Jessica Borg
+ */
 
 import java.net.*;
 import java.io.*;
@@ -21,6 +26,11 @@ public class Server {
     }
 
 
+    /**
+     * This method creates a connection with a Client that wants to connect to the Server.
+     * If connection succeeds the Server waits for message from Client and displaying them back.
+     * @throws IOException
+     */
     public void receiveMessageAndConfirm() throws IOException {
         ss = new ServerSocket(2000);
         while(true) {
@@ -45,11 +55,7 @@ public class Server {
                         break;
                     }
                 }
-                socket.close();
-                in.close();
-                out.close();
-                bf.close();
-                bw.close();
+                socket.close(); in.close(); out.close(); bf.close(); bw.close();
 
             } catch (IOException e){
                 e.printStackTrace();

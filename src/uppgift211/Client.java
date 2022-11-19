@@ -1,11 +1,16 @@
 package uppgift211;
 
-import java.awt.image.BufferedImage;
+
 import java.net.*;
 import java.io.*;
 import java.util.Scanner;
 
-//https://www.youtube.com/watch?v=gchR3DpY-8Q&ab_channel=WittCode
+/**
+ * This class represents a Client connecting to a Server for then sending messages to the Server.
+ *
+ * @author Jessica Borg
+ */
+
 
 public class Client {
 
@@ -33,11 +38,24 @@ public class Client {
         this.host = host;
     }
 
+    /**
+     * This method returns the Client host.
+     * @return host
+     */
     public String getHost() {return host;}
 
+    /**
+     * This method returns the Client port.
+     * @return port
+     */
     public int getPort() {return port;}
 
 
+    /**
+     * This method sends a message to a Server by user input and receives a confirmation if the message was received and
+     * what message was sent.
+     * @throws IOException
+     */
     public void sendMessage() throws IOException {
         try {
 
