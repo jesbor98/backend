@@ -2,7 +2,7 @@ package uppgift1;
 
 /**
  * @author Jessica Borg
- * Program which uses multithreading to demonstrate uses of multiple execution of code.
+ * This class uses multithreading to demonstrate the usage of threads and their function.
  * Threads are independent - neither of the threads used in the program affects each other.
  *
  */

@@ -1,5 +1,11 @@
 package uppgift1;
 
+/**
+ * This class represents one thread which is created by extending Thread
+ *
+ * @author Jessica Borg
+ */
+
 public class T1 extends Thread {
 
     @Override
