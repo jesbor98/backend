@@ -1,5 +1,6 @@
 package uppgift211;
 
+import java.awt.image.BufferedImage;
 import java.net.*;
 import java.io.*;
 import java.util.Scanner;
@@ -8,42 +9,39 @@ import java.util.Scanner;
 
 public class Client {
 
-//    private int port;
-//    private String host;
-//
-//    public Client() {
-//        this.port = 2000;
-//        this.host = "127.0.0.1";
-//    }
-//
-//    public Client(String host) {
-//        this.port = 2000;
-//        this.host = host;
-//    }
-//
-//    public Client(String host, int port) {
-//        this.port = port;
-//        this.host = host;
-//    }
-//
-//    public String getHost() {return host;}
-//
-//    public int getPort() {return port;}
+    private Socket socket;
+    private InputStreamReader in;
+    private OutputStreamWriter out;
+    private BufferedReader bf;
+    private BufferedWriter bw;
 
-    public static void main (String[] args) throws IOException {
-        Socket socket = null;
-        InputStreamReader in = null;
+    private int port;
+    private String host;
 
-        // bridge from bites -> characters
-        OutputStreamWriter out = null;
+    public Client() {
+        this.port = 2000;
+        this.host = "127.0.0.1";
+    }
 
-        // Buffer = speed the input/output operations, read blocks at time
-        // Wrap inputstream with buffer
-        BufferedReader bf = null;
-        BufferedWriter bw = null;
+    public Client(String host) {
+        this.port = 2000;
+        this.host = host;
+    }
 
+    public Client(String host, int port) {
+        this.port = port;
+        this.host = host;
+    }
+
+    public String getHost() {return host;}
+
+    public int getPort() {return port;}
+
+
+    public void sendMessage() throws IOException {
         try {
-            socket = new Socket("127.0.0.1", 2000);
+
+            socket = new Socket(getHost(), getPort());
 
             in = new InputStreamReader(socket.getInputStream());
             out = new OutputStreamWriter(socket.getOutputStream());
@@ -53,7 +51,7 @@ public class Client {
 
             Scanner scanner = new Scanner(System.in);
 
-            while(true) {
+            while (true) {
                 String msgToSend = scanner.nextLine();
                 bw.write(msgToSend);
                 bw.newLine();
@@ -61,31 +59,19 @@ public class Client {
 
                 System.out.println("Server: " + bf.readLine());
 
-                if(msgToSend.equalsIgnoreCase("BYE")) {
+                if (msgToSend.equalsIgnoreCase("BYE")) {
                     break; //out of the while-loop
                 }
-
             }
-
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if(socket != null)
-                    socket.close();
-                if(in != null)
-                    in.close();
-                if(out != null)
-                    out.close();
-                if(bf != null)
-                    bf.close();
-                if(bw != null)
-                    bw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
+
     }
 
-
+    public static void main(String[] args) throws IOException {
+        Client client = new Client();
+        client.sendMessage();
+    }
 }
+

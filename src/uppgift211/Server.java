@@ -7,18 +7,22 @@ import java.util.Scanner;
 
 public class Server {
 
-    public static void main(String [] args) throws IOException {
+    private Socket socket;
+    private InputStreamReader in;
+    private OutputStreamWriter out;
+    private BufferedReader bf;
+    private BufferedWriter bw;
 
-        Socket socket = null;
-        InputStreamReader in = null;
-        OutputStreamWriter out = null;
-        BufferedReader bf = null;
-        BufferedWriter bw = null;
+    private ServerSocket ss;
+    private int port;
 
-        ServerSocket ss = null;
+    public Server() throws IOException {
+        port = 2000;
+    }
 
-        ss = new ServerSocket(2001);
 
+    public void receiveMessageAndConfirm() throws IOException {
+        ss = new ServerSocket(2000);
         while(true) {
             try {
                 socket = ss.accept();
@@ -33,7 +37,7 @@ public class Server {
                     String msgFromClient = bf.readLine();
                     System.out.println("Client: " + msgFromClient);
 
-                    bw.write("MSG Received");
+                    bw.write("MSG Received: " + msgFromClient);
                     bw.newLine();
                     bw.flush();
 
@@ -51,5 +55,10 @@ public class Server {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        Server server = new Server();
+        server.receiveMessageAndConfirm();
     }
 }
