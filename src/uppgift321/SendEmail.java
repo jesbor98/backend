@@ -22,10 +22,17 @@ import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.Properties;
 
-public class EmailGUI extends Application {
+public class SendEmail extends Application {
 
     private ArrayList<TextField> emailInfoInput = new ArrayList<>();
     private ArrayList<TextField> messageInfoInput = new ArrayList<>();
+
+    private TextField username;
+    private TextField password;
+    private TextField from;
+    private TextField to;
+    private TextField subject;
+    private TextArea messageText;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -41,66 +48,36 @@ public class EmailGUI extends Application {
         TextField emailServer = new TextField();
         emailServer.setPromptText("Server name: ");
         emailInfoInput.add(emailServer);
-        TextField username = new TextField();
+        username = new TextField();
         username.setPromptText("Username: ");
         emailInfoInput.add(username);
-        TextField password = new TextField();
+        password = new TextField();
         password.setPromptText("Password: ");
         emailInfoInput.add(password);
 
         //TEXTFIELDS:
-        TextField from = new TextField();
+        from = new TextField();
         from.setPromptText("From: ");
         messageInfoInput.add(from);
-        TextField to = new TextField();
+        to = new TextField();
         to.setPromptText("To: ");
         messageInfoInput.add(to);
-        TextField subject = new TextField();
+        subject = new TextField();
         subject.setPromptText("Subject: ");
         messageInfoInput.add(subject);
 
-        TextArea messageText = new TextArea();
+        messageText = new TextArea();
         messageText.setPromptText("Message: ");
 
-        Button sendButton = new Button("Send Email"); //set on action and send it
+        Button sendButton = new Button("Send"); //set on action and send it
         sendButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-
-                Properties properties = new Properties();
-                properties.put("mail.smtp.auth", true);
-                properties.put("mail.smtp.host", emailServer.getText());
-                properties.put("mail.smtp.port", 587); //port 465 eller 587
-                properties.put("mail.smpt.starttls.enable", true);
-                properties.put("mail.transport.protocol", "smtp");
-
-                //Authenticator = object that obtain information for a network connection
-                Session session = Session.getInstance(properties, new Authenticator() {
-                    @Override
-                    //getPassword(...) is called when password authorization is needed, needen
-                    // when signing in to an account
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(username.getText(), password.getText());
-                    }
-                });
-
-                Message message = new MimeMessage(session);
                 try {
-                    Address toAdress = new InternetAddress(to.getText());
-                    Address fromAdress = new InternetAddress(from.getText());
-                    message.setFrom(fromAdress);
-                    message.setRecipient(Message.RecipientType.TO, toAdress);
-                    message.setSubject(subject.getText());
-                    message.setText(messageText.getText());
-
-                    Transport.send(message);
-                    System.out.println("Email sent!");
-                } catch (AddressException e) {
-                    e.printStackTrace();
+                    sendEmail(to.getText());
                 } catch (MessagingException e) {
                     e.printStackTrace();
                 }
-
             }
         });
         root.getChildren().addAll(label, emailServer, username, password, from, to, subject, messageText, sendButton);
@@ -110,6 +87,49 @@ public class EmailGUI extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
+    public void sendEmail(String recipient) throws MessagingException {
+        Properties properties = new Properties();
+
+        properties.put("mail.smtp.auth", true); //gmail
+        properties.put("mail.smtp.host", "smtp.gmail.com"); //connect to gmail (prev: emailServer.getText())
+        properties.put("mail.smtp.port", 465); //port 465 eller (587 = gmail)
+        properties.put("mail.smpt.starttls.enable", true); //et tls encryption enabled
+        properties.put("mail.transport.protocol", "smtp");
+
+
+        Session session = Session.getInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username.getText(), password.getText());
+            }
+        });
+
+        Message message = prepMessage(session, from.getText(), recipient);
+
+        //Send email:
+        Transport.send(message);
+        System.out.println("Message was sent successfully!");
+    }
+
+    private Message prepMessage(Session session, String from, String recipient) {
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(from));
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            message.setSubject(subject.getText());
+            message.setText(messageText.getText());
+            return message;
+
+        } catch (AddressException e) {
+            e.printStackTrace();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 
     public static void main(String[] args) {
         launch(args);
