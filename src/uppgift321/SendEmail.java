@@ -1,4 +1,9 @@
 package uppgift321;
+//Code w JavaFX:
+//https://github.com/ugurkebir/JavaFX-Mail-Sender/blob/master/Main.java
+/**
+ * Using SMTP (Simple Mail Transfer Protocol) to send Email.
+ */
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -10,9 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import javax.mail.*;
@@ -24,16 +27,21 @@ import java.util.Properties;
 
 public class SendEmail extends Application {
 
-    private ArrayList<TextField> emailInfoInput = new ArrayList<>();
-    private ArrayList<TextField> messageInfoInput = new ArrayList<>();
-
+    private Session session;
     private TextField username;
     private TextField password;
     private TextField from;
     private TextField to;
     private TextField subject;
+    private TextField emailServer;
     private TextArea messageText;
 
+    /**
+     * Launch application and GUI.
+     * When user presses the Send-Button - the email will send.
+     * @param stage
+     * @throws Exception
+     */
     @Override
     public void start(Stage stage) throws Exception {
         stage.setTitle("Send Email");
@@ -45,36 +53,32 @@ public class SendEmail extends Application {
         label.setAlignment(Pos.CENTER);
 
         //EMAIL SPECIFIC INFO:
-        TextField emailServer = new TextField();
+        emailServer = new TextField();
         emailServer.setPromptText("Server name: ");
-        emailInfoInput.add(emailServer);
         username = new TextField();
         username.setPromptText("Username: ");
-        emailInfoInput.add(username);
         password = new TextField();
         password.setPromptText("Password: ");
-        emailInfoInput.add(password);
 
         //TEXTFIELDS:
         from = new TextField();
         from.setPromptText("From: ");
-        messageInfoInput.add(from);
         to = new TextField();
         to.setPromptText("To: ");
-        messageInfoInput.add(to);
         subject = new TextField();
         subject.setPromptText("Subject: ");
-        messageInfoInput.add(subject);
 
         messageText = new TextArea();
         messageText.setPromptText("Message: ");
+
+        getProperties();
 
         Button sendButton = new Button("Send"); //set on action and send it
         sendButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 try {
-                    sendEmail(to.getText());
+                    sendEmail();
                 } catch (MessagingException e) {
                     e.printStackTrace();
                 }
@@ -82,39 +86,52 @@ public class SendEmail extends Application {
         });
         root.getChildren().addAll(label, emailServer, username, password, from, to, subject, messageText, sendButton);
 
-
         Scene scene = new Scene(root, 800, 500);
         stage.setScene(scene);
         stage.show();
     }
 
-    public void sendEmail(String recipient) throws MessagingException {
+    /**
+     * Apply properties for sending email.
+     */
+    public void getProperties() {
         Properties properties = new Properties();
 
         properties.put("mail.smtp.auth", true); //gmail
-        properties.put("mail.smtp.host", "smtp.gmail.com"); //connect to gmail (prev: emailServer.getText())
+        properties.put("mail.smtp.host", emailServer.getText()); //connect to gmail (prev: emailServer.getText())
         properties.put("mail.smtp.port", 465); //port 465 eller (587 = gmail)
-        properties.put("mail.smpt.starttls.enable", true); //et tls encryption enabled
+        properties.put("mail.smtp.starttls.enable", true); //et tls encryption enabled
         properties.put("mail.transport.protocol", "smtp");
 
-
-        Session session = Session.getInstance(properties, new Authenticator() {
+        session = Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username.getText(), password.getText());
             }
         });
+    }
 
-        Message message = prepMessage(session, from.getText(), recipient);
-
+    /**
+     * Send email with the MimeMessage class by prepping the message using the session, sender and receiver.
+     * @throws MessagingException
+     */
+    public void sendEmail() throws MessagingException {
+        MimeMessage message = prepMessage(session, from.getText(), to.getText());
         //Send email:
         Transport.send(message);
         System.out.println("Message was sent successfully!");
     }
 
-    private Message prepMessage(Session session, String from, String recipient) {
+    /**
+     * Creates a MimeMessage to send.
+     * @param session
+     * @param from
+     * @param recipient
+     * @return the MimeMessage created by input arguments.
+     */
+    private MimeMessage prepMessage(Session session, String from, String recipient) {
         try {
-            Message message = new MimeMessage(session);
+            MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
             message.setSubject(subject.getText());
@@ -124,14 +141,30 @@ public class SendEmail extends Application {
         } catch (AddressException e) {
             e.printStackTrace();
         } catch (MessagingException e) {
+            System.out.println("Sending message failed.");
             e.printStackTrace();
         }
         return null;
     }
 
+    /**
+     * Clear TextFields in GUI after sending email.
+     */
+    private void clearTextFields() {
+        messageText.clear();
+        username.clear();
+        password.clear();
+        from.clear();
+        to.clear();;
+        emailServer.clear();
+        subject.clear();
+    }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MessagingException {
         launch(args);
+        SendEmail sendEmail = new SendEmail();
+        sendEmail.sendEmail();
+        sendEmail.clearTextFields();
     }
 }
