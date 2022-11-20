@@ -7,6 +7,7 @@ package uppgift321;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -22,6 +23,7 @@ import javax.mail.*;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -162,9 +164,17 @@ public class SendEmail extends Application {
 
 
     public static void main(String[] args) throws MessagingException {
-        launch(args);
-        SendEmail sendEmail = new SendEmail();
-        sendEmail.sendEmail();
-        sendEmail.clearTextFields();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    launch(args);
+                    SendEmail sender = new SendEmail();
+                    sender.clearTextFields();
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
     }
 }
