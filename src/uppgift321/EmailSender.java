@@ -1,13 +1,11 @@
 package uppgift321;
-//Code w JavaFX:
-//https://github.com/ugurkebir/JavaFX-Mail-Sender/blob/master/Main.java
+
 /**
  * Using SMTP (Simple Mail Transfer Protocol) to send Email.
  */
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -23,11 +21,12 @@ import javax.mail.*;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.awt.EventQueue;
-import java.util.ArrayList;
 import java.util.Properties;
 
-public class SendEmail extends Application {
+public class EmailSender extends Application {
+
+    private static final String GMAIL_HOST = "smtp.gmail.com";
+    private static final int GMAIL_PORT = 587;
 
     private Session session;
     private TextField username;
@@ -35,13 +34,12 @@ public class SendEmail extends Application {
     private TextField from;
     private TextField to;
     private TextField subject;
-    private TextField emailServer;
     private TextArea messageText;
 
     /**
      * Launch application and GUI.
-     * When user presses the Send-Button - the email will send.
-     * @param stage
+     * When user presses the Send-Button - email will send.
+     * @param stage where GUI appears.
      * @throws Exception
      */
     @Override
@@ -51,18 +49,18 @@ public class SendEmail extends Application {
         root.setAlignment(Pos.CENTER);
         root.setOrientation(Orientation.VERTICAL);
 
-        Label label = new Label("Send an email");
-        label.setAlignment(Pos.CENTER);
+        Label labelSend = new Label("Send email: ");
+        labelSend.setAlignment(Pos.CENTER);
 
-        //EMAIL SPECIFIC INFO:
-        emailServer = new TextField();
-        emailServer.setPromptText("Server name: ");
+        Label labelAuth = new Label("Enter username and password for gmail-account: ");
+
+        // Account specific information:
         username = new TextField();
         username.setPromptText("Username: ");
         password = new TextField();
         password.setPromptText("Password: ");
 
-        //TEXTFIELDS:
+        // Email specific information:
         from = new TextField();
         from.setPromptText("From: ");
         to = new TextField();
@@ -75,7 +73,7 @@ public class SendEmail extends Application {
 
         getProperties();
 
-        Button sendButton = new Button("Send"); //set on action and send it
+        Button sendButton = new Button("Send");
         sendButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -86,7 +84,7 @@ public class SendEmail extends Application {
                 }
             }
         });
-        root.getChildren().addAll(label, emailServer, username, password, from, to, subject, messageText, sendButton);
+        root.getChildren().addAll(labelAuth, username, password, labelSend, from, to, subject, messageText, sendButton);
 
         Scene scene = new Scene(root, 800, 500);
         stage.setScene(scene);
@@ -94,15 +92,15 @@ public class SendEmail extends Application {
     }
 
     /**
-     * Apply properties for sending email.
+     * Apply properties to send email.
      */
     public void getProperties() {
         Properties properties = new Properties();
 
         properties.put("mail.smtp.auth", true); //gmail
-        properties.put("mail.smtp.host", emailServer.getText()); //connect to gmail (prev: emailServer.getText())
-        properties.put("mail.smtp.port", 465); //port 465 eller (587 = gmail)
-        properties.put("mail.smtp.starttls.enable", true); //et tls encryption enabled
+        properties.put("mail.smtp.host", GMAIL_HOST); //connect to gmail
+        properties.put("mail.smtp.port", GMAIL_PORT); //port 587 for gmail (465/default 25)
+        properties.put("mail.smtp.starttls.enable", true);
         properties.put("mail.transport.protocol", "smtp");
 
         session = Session.getInstance(properties, new Authenticator() {
@@ -114,14 +112,18 @@ public class SendEmail extends Application {
     }
 
     /**
-     * Send email with the MimeMessage class by prepping the message using the session, sender and receiver.
+     * Send email with MimeMessage class and prepping the email to send.
      * @throws MessagingException
      */
     public void sendEmail() throws MessagingException {
         MimeMessage message = prepMessage(session, from.getText(), to.getText());
+        Transport transport = session.getTransport();
+        transport.connect(GMAIL_HOST, GMAIL_PORT, username.getText(), password.getText()); //gmail
         //Send email:
-        Transport.send(message);
+        transport.send(message);
         System.out.println("Message was sent successfully!");
+        clearTextFields();
+        transport.close();
     }
 
     /**
@@ -139,7 +141,6 @@ public class SendEmail extends Application {
             message.setSubject(subject.getText());
             message.setText(messageText.getText());
             return message;
-
         } catch (AddressException e) {
             e.printStackTrace();
         } catch (MessagingException e) {
@@ -158,23 +159,11 @@ public class SendEmail extends Application {
         password.clear();
         from.clear();
         to.clear();;
-        emailServer.clear();
         subject.clear();
     }
 
 
-    public static void main(String[] args) throws MessagingException {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    launch(args);
-                    SendEmail sender = new SendEmail();
-                    sender.clearTextFields();
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
-            }
-        });
+    public static void main(String[] args) throws Exception {
+        launch(args);
     }
 }
