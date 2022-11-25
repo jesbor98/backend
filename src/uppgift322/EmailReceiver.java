@@ -17,7 +17,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.util.Properties;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -32,20 +31,8 @@ public class EmailReceiver extends Application {
     private TextField username;
     private TextField password;
 
-    private String host;
-    private String mailStoreType;
-    private String usernameText;
-    private String passwordText;
-
-    public EmailReceiver() {
-        this.host = "pop.gmail.com";
-        this.mailStoreType = "pop3s";
-        this.usernameText = username.getText();
-        this.passwordText = password.getText();
-    }
-
     /**
-     * Launch application with GUI.
+     * Creates GUI for application.
      * @param stage
      * @throws Exception
      */
@@ -61,33 +48,31 @@ public class EmailReceiver extends Application {
 
         //EMAIL SPECIFIC INFO:
         emailServer = new TextField();
-        emailServer.setPromptText("Server name: ");
-        if(!emailServer.getText().equalsIgnoreCase("pop3s") || !emailServer.getText().equalsIgnoreCase("imap")) {
-            System.out.println("Error: Only server POP3S or IMAP can be used.");
-        }
+        emailServer.setPromptText("Server name: "); //using pop.gmail.com, could be Imap as well.
         username = new TextField();
         username.setPromptText("Username: ");
         password = new TextField();
         password.setPromptText("Password: ");
 
-        TextArea viewMessage = new TextArea();
 
 
-        Button receiveButton = new Button("Receive Emails");
+        Button receiveButton = new Button("Show Emails");
         receiveButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 try {
-                    String message = checkEmails(emailServer.getText(), username.getText(), password.getText());
-                    viewMessage.setText(message);
+                    String messages = checkEmails(emailServer.getText(), username.getText(), password.getText());
+                    TextArea viewMessage = new TextArea();
+                    viewMessage.setText(messages);
                     emailServer.clear(); username.clear(); password.clear();
+                    root.getChildren().add(viewMessage);
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
             }
         });
 
-        root.getChildren().addAll(label, emailServer, username, password);
+        root.getChildren().addAll(label, emailServer, username, password, receiveButton);
 
 
         Scene scene = new Scene(root, 800, 500);
@@ -97,44 +82,43 @@ public class EmailReceiver extends Application {
 
 
     /**
-     * Connects to server and creates a session, a pop3 object, a folder and prints the messages.
-     * @param host
-     * @param user
-     * @param password
+     * Connects to email-inbox and parsing the text from emails to be shown for user.
+     * @param host name
+     * @param username for account (email-address)
+     * @param password for account
      */
-    public static String checkEmails(String host, String user, String password) {
+    public static String checkEmails(String host, String username, String password) {
         try {
             Properties properties = new Properties();
-            properties.put("mail.pop3.host", host); //get host (pop.gmail.com for gmail)
-            properties.put("mail.pop3.port", 995); //port number
+            properties.put("mail.pop3.host", host); // using "pop.gmail.com" for gmail)
+            properties.put("mail.pop3.port", 995); //port
             properties.put("mail.pop3.starttls.enable", true);
 
             Session emailSession = Session.getDefaultInstance(properties);
 
-            //POP3 storeobject + connection w pop server:
-            Store store = emailSession.getStore(); //can be 'Imap' as well
-            store.connect(host, user, password);
+            //POP3 storeobject + connection with pop server:
+            Store store = emailSession.getStore("pop3s"); //can be 'Imap' as well
+            store.connect(host, username, password);
             System.out.println("Connecting to server...");
 
-            //folder object for open the inbox_
+            //Folder object created to open the email-inbox:
             Folder emailfolder = store.getFolder("INBOX");
             emailfolder.open(Folder.READ_ONLY);
 
-            //Get messages:
-            Message [] messages = emailfolder.getMessages(1, 6); //get all messages in inbox, choose how many by typing getMessages(1, 6) = get msg 1-6
+            Message [] messages = emailfolder.getMessages(1, 6); //without input, you show all messages in inbox. This prints out messages 1-6
 
-            String totalMessages = "";
+            String emailMessages = "";
             for (int i=0, n=messages.length; i<n; i++) {
                 Message message = messages[i];
-                totalMessages = totalMessages +
+                emailMessages = emailMessages +
                         "Message: " + (i+1) +
                         "\nFrom: " + message.getFrom()[0] +
                         "\nSubject: " + message.getSubject() + "\n";
             }
             //Close connection:
-            emailfolder.close();
-            store.close();
-            return totalMessages;
+            //emailfolder.close();
+            //store.close();
+            return emailMessages;
 
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
@@ -145,20 +129,10 @@ public class EmailReceiver extends Application {
     }
 
     /**
-     * Runs application by applying with GUI and creates the EmailReceiver.
+     * Runs application by launching GUI.
      * @param args
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    EmailReceiver receiver = new EmailReceiver();
-                    launch(args);
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
-            }
-        });
+        launch(args);
     }
 }
