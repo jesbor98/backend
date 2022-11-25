@@ -1,5 +1,4 @@
 package uppgift322;
-//https://github.com/manaschaudhary/mail_receiver/blob/main/mailreceiver/src/main/java/com/rd/mailreceiver/EmailReceiver.java
 /**
  * Using POP3 (Post Office Protocol) to receive Email-message
  */
