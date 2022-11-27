@@ -12,6 +12,8 @@ import java.util.Scanner;
 
 public class Server {
 
+    private static final int DEFAULT_PORT = 2000;
+
     private Socket socket;
     private InputStreamReader in;
     private OutputStreamWriter out;
@@ -22,7 +24,7 @@ public class Server {
     private int port;
 
     public Server() {
-        port = 2000;
+        port = DEFAULT_PORT;
     }
     public Server(int port) {
         this.port = port;

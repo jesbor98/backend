@@ -14,6 +14,9 @@ import java.util.Scanner;
 
 public class Client {
 
+    private static final int DEFAULT_PORT = 2000;
+    private static final String DEFAULT_HOST = "127.0.0.1";
+
     private Socket socket;
     private InputStreamReader in;
     private OutputStreamWriter out;
@@ -24,12 +27,12 @@ public class Client {
     private String host;
 
     public Client() {
-        this.port = 2000;
-        this.host = "127.0.0.1";
+        this.port = DEFAULT_PORT;
+        this.host = DEFAULT_HOST;
     }
 
     public Client(String host) {
-        this.port = 2000;
+        this.port = DEFAULT_PORT;
         this.host = host;
     }
 
