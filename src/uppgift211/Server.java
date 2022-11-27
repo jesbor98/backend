@@ -26,9 +26,9 @@ public class Server {
     public Server() {
         port = DEFAULT_PORT;
     }
-    public Server(int port) {
+    /*public Server(int port) {
         this.port = port;
-    }
+    }*/
 
 
     /**
@@ -69,20 +69,7 @@ public class Server {
     }
 
    public static void main(String[] args) throws IOException {
-        switch(args.length) {
-            case 0:
-                Server server = new Server();
-                server.receiveMessageAndConfirm();
-            case 1:
-                Server server1 = new Server();
-                server1.receiveMessageAndConfirm();
-            case 2:
-                int port = Integer.parseInt(args[2]);
-                Server server2 = new Server(port);
-                server2.receiveMessageAndConfirm();
-
-            default:
-                break;
-        }
+        Server server = new Server();
+        server.receiveMessageAndConfirm();
     }
 }
