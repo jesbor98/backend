@@ -38,27 +38,55 @@ public class Client {
         this.host = host;
     }
 
+    /*public static void main(String[] args) throws IOException {
+        Client client = new Client();
+        client.sendMessage();
+    }*/
+
+    public static void main(String[] args) throws IOException {
+        switch (args.length) {
+            case 0:
+                Client client0 = new Client();
+                client0.sendMessage();
+            case 1:
+                String host = args[0];
+                Client client1 = new Client(host);
+                client1.sendMessage();
+                break;
+            case 2:
+                String host2 = args[0];
+                int port2 = Integer.parseInt(args[1]);
+                Client client2 = new Client(host2, port2);
+                client2.sendMessage();
+            default:
+                break;
+        }
+    }
+
     /**
      * This method returns the Client host.
      * @return host
      */
-    public String getHost() {return host;}
+    public String getHost() {
+        return host;
+    }
 
     /**
      * This method returns the Client port.
      * @return port
      */
-    public int getPort() {return port;}
+    public int getPort() {
+        return port;
+    }
 
 
     /**
      * This method sends a message to a Server by user input and receives a confirmation if the message was received and
      * what message was sent.
-     * @throws IOException
+     *
      */
-    public void sendMessage() throws IOException {
+    public void sendMessage() {
         try {
-
             socket = new Socket(getHost(), getPort());
 
             in = new InputStreamReader(socket.getInputStream());
@@ -85,11 +113,6 @@ public class Client {
             e.printStackTrace();
         }
 
-    }
-
-    public static void main(String[] args) throws IOException {
-        Client client = new Client();
-        client.sendMessage();
     }
 }
 

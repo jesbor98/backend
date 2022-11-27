@@ -21,8 +21,11 @@ public class Server {
     private ServerSocket ss;
     private int port;
 
-    public Server() throws IOException {
+    public Server() {
         port = 2000;
+    }
+    public Server(int port) {
+        this.port = port;
     }
 
 
@@ -63,8 +66,21 @@ public class Server {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        Server server = new Server();
-        server.receiveMessageAndConfirm();
+   public static void main(String[] args) throws IOException {
+        switch(args.length) {
+            case 0:
+                Server server = new Server();
+                server.receiveMessageAndConfirm();
+            case 1:
+                Server server1 = new Server();
+                server1.receiveMessageAndConfirm();
+            case 2:
+                int port = Integer.parseInt(args[2]);
+                Server server2 = new Server(port);
+                server2.receiveMessageAndConfirm();
+
+            default:
+                break;
+        }
     }
 }
