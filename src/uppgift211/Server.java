@@ -8,6 +8,8 @@ package uppgift211;
 
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Server {
@@ -21,14 +23,20 @@ public class Server {
     private BufferedWriter bw;
 
     private ServerSocket ss;
-    private int port;
 
-    public Server() {
-        port = DEFAULT_PORT;
+    public static void main(String[] args) throws IOException {
+        System.out.println("Server started");
+        BufferedReader bufferedReader;
+        PrintWriter printWriter;
+        ArrayList<ServerThread> threads = new ArrayList<>();
+
+        ServerSocket serverSocket = new ServerSocket(DEFAULT_PORT);
+        while(true) {
+            Socket socket = serverSocket.accept();
+            ServerThread serverThread = new ServerThread(socket, threads);
+            threads.add(serverThread);
+        }
     }
-    /*public Server(int port) {
-        this.port = port;
-    }*/
 
 
     /**
@@ -66,10 +74,5 @@ public class Server {
                 e.printStackTrace();
             }
         }
-    }
-
-   public static void main(String[] args) throws IOException {
-        Server server = new Server();
-        server.receiveMessageAndConfirm();
     }
 }

@@ -17,12 +17,6 @@ public class Client {
     private static final int DEFAULT_PORT = 2000;
     private static final String DEFAULT_HOST = "127.0.0.1";
 
-    private Socket socket;
-    private InputStreamReader in;
-    private OutputStreamWriter out;
-    private BufferedReader bf;
-    private BufferedWriter bw;
-
     private int port;
     private String host;
 
@@ -41,81 +35,56 @@ public class Client {
         this.host = host;
     }
 
-    /*public static void main(String[] args) throws IOException {
-        Client client = new Client();
-        client.sendMessage();
-    }*/
-
     public static void main(String[] args) throws IOException {
+        Socket connectionWithServer;
+        BufferedReader bufferedReader;
+        PrintWriter printWriter;
+        Scanner scanner = new Scanner(System.in);
+
+        String host = DEFAULT_HOST;
+        int port = DEFAULT_PORT;
+
         switch (args.length) {
             case 0:
-                Client client0 = new Client();
-                client0.sendMessage();
+                Client client = new Client(); break;
             case 1:
-                String host = args[0];
-                Client client1 = new Client(host);
-                client1.sendMessage();
-                break;
+                host = args[0];
+                client = new Client(host); break;
             case 2:
-                String host2 = args[0];
-                int port2 = Integer.parseInt(args[1]);
-                Client client2 = new Client(host2, port2);
-                client2.sendMessage();
+                host = args[0];
+                port = Integer.parseInt(args[1]);
+                client = new Client(host, port);
             default:
                 break;
         }
-    }
+        connectionWithServer = new Socket(host, port);
+        bufferedReader = new BufferedReader(new InputStreamReader(connectionWithServer.getInputStream()));
+        printWriter = new PrintWriter(connectionWithServer.getOutputStream(), true);
 
-    /**
-     * This method returns the Client host.
-     * @return host
-     */
-    public String getHost() {
-        return host;
-    }
+        ClientThread clients = new ClientThread(connectionWithServer);
+        String username = null;
+        String messageBack;
+        String input;
 
-    /**
-     * This method returns the Client port.
-     * @return port
-     */
-    public int getPort() {
-        return port;
-    }
+        System.out.println("Hello, welcome to the chat!");
 
+        if (username == null) {
+            System.out.println("Enter name to join the chat: ");
+            input = scanner.nextLine();
+            username = input;
+        } else {
+            String message = username + ": ";
+            input = scanner.nextLine();
+            System.out.println(message + input);
 
-    /**
-     * This method sends a message to a Server by user input and receives a confirmation if the message was received and
-     * what message was sent.
-     *
-     */
-    public void sendMessage() {
-        try {
-            socket = new Socket(getHost(), getPort());
-
-            in = new InputStreamReader(socket.getInputStream());
-            out = new OutputStreamWriter(socket.getOutputStream());
-
-            bf = new BufferedReader(in);
-            bw = new BufferedWriter(out);
-
-            Scanner scanner = new Scanner(System.in);
-
-            while (true) {
-                String msgToSend = scanner.nextLine();
-                bw.write(msgToSend);
-                bw.newLine();
-                bw.flush(); //flushes the stream, usually used for really big texts, good for efficiency
-
-                System.out.println("Server: " + bf.readLine());
-
-                if (msgToSend.equalsIgnoreCase("BYE")) {
-                    break; //out of the while-loop
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
     }
+
+
+
+
+
+
+
 }
 
