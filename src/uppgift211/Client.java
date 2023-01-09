@@ -1,90 +1,62 @@
 package uppgift211;
 
-
-import java.net.*;
-import java.io.*;
-import java.util.Scanner;
-
-/**
- * This class represents a Client connecting to a Server for then sending messages to the Server.
- *
- * @author Jessica Borg
- */
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 public class Client {
 
-    private static final int DEFAULT_PORT = 2000;
-    private static final String DEFAULT_HOST = "127.0.0.1";
-
-    private int port;
-    private String host;
-
-    public Client() {
-        this.port = DEFAULT_PORT;
-        this.host = DEFAULT_HOST;
-    }
-
-    public Client(String host) {
-        this.port = DEFAULT_PORT;
-        this.host = host;
-    }
-
-    public Client(String host, int port) {
-        this.port = port;
-        this.host = host;
-    }
-
     public static void main(String[] args) throws IOException {
-        Socket connectionWithServer;
-        BufferedReader bufferedReader;
-        PrintWriter printWriter;
-        Scanner scanner = new Scanner(System.in);
+        // 3 ways to start the Client:
+        String host = "127.0.0.1"; //default
+        int port = 2000;
+        if (args.length > 0) { //host + default port
+            host = args[0];
+        }
+        if (args.length > 1) { //host + port
+            port = Integer.parseInt(args[1]);
+        }
 
-        String host = DEFAULT_HOST;
-        int port = DEFAULT_PORT;
+        //Socket + anslut till server:
+        Socket socket = new Socket(host, port);
+        System.out.println("Connection with server established.");
 
-        switch (args.length) {
-            case 0:
-                Client client = new Client(); break;
-            case 1:
-                host = args[0];
-                client = new Client(host); break;
-            case 2:
-                host = args[0];
-                port = Integer.parseInt(args[1]);
-                client = new Client(host, port);
-            default:
+        // Streams f.a. läsa/skriva till servern:
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+
+        // Skapa en tråd för att ta emot textmeddelanden från chattservern
+        new Thread(() -> {
+            try {
+                while (true) {
+                    String message = in.readLine();
+                    if (message == null) {
+                        break;
+                    }
+                    System.out.println(message);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        //loop fa läsa in textmeddelanden från användaren och skicka till chattservern
+        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+        while (true) {
+            String message = userInput.readLine();
+            if (message.equals("quit")) {
                 break;
+            }
+            out.println(message);
+            out.flush();
         }
-        connectionWithServer = new Socket(host, port);
-        bufferedReader = new BufferedReader(new InputStreamReader(connectionWithServer.getInputStream()));
-        printWriter = new PrintWriter(connectionWithServer.getOutputStream(), true);
 
-        ClientThread clients = new ClientThread(connectionWithServer);
-        String username = null;
-        String messageBack;
-        String input;
-
-        System.out.println("Hello, welcome to the chat!");
-
-        if (username == null) {
-            System.out.println("Enter name to join the chat: ");
-            input = scanner.nextLine();
-            username = input;
-        } else {
-            String message = username + ": ";
-            input = scanner.nextLine();
-            System.out.println(message + input);
-
-        }
+        // Stäng socketen + streamerna
+        socket.close();
+        in.close();
+        out.close();
     }
-
-
-
-
-
-
-
 }
-
