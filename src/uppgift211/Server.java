@@ -1,78 +1,52 @@
 package uppgift211;
-/**
- * This class act as a Server which a Client connects to by a Stream Socket connection. When connected the class
- * receives messages sent from the Client and confirms back to the Client what message was sent.
- *
- * @author Jessica Borg
- */
 
-import java.net.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.net.*;
+import java.util.*;
 
 public class Server {
-
-    private static final int DEFAULT_PORT = 2000;
-
-    private Socket socket;
-    private InputStreamReader in;
-    private OutputStreamWriter out;
-    private BufferedReader bf;
-    private BufferedWriter bw;
-
-    private ServerSocket ss;
-
     public static void main(String[] args) throws IOException {
-        System.out.println("Server started");
-        BufferedReader bufferedReader;
-        PrintWriter printWriter;
-        ArrayList<ServerThread> threads = new ArrayList<>();
+        // port enl uppgift:
+        int port = 2000;
+        /*if (args.length > 0) {
+            port = Integer.parseInt(args[0]);
+        }*/
 
-        ServerSocket serverSocket = new ServerSocket(DEFAULT_PORT);
-        while(true) {
-            Socket socket = serverSocket.accept();
-            ServerThread serverThread = new ServerThread(socket, threads);
-            threads.add(serverThread);
-        }
-    }
+        // server-socket + binda den till port:
+        ServerSocket serverSocket = new ServerSocket(port);
+        System.out.println("Server listening on port " + port);
 
+        // lista för att spara chattklienterna och dess sockets (f.a. flera clienter ska kunna ansluta till Servern):
+        List<Socket> clientSockets = new ArrayList<>();
 
-    /**
-     * This method creates a connection with a Client that wants to connect to the Server.
-     * If connection succeeds the Server waits for message from Client and displaying them back.
-     * @throws IOException
-     */
-    public void receiveMessageAndConfirm() throws IOException {
-        ss = new ServerSocket(2000);
-        while(true) {
-            try {
-                socket = ss.accept();
-                System.out.println("Client connected");
-                in = new InputStreamReader(socket.getInputStream());
-                out = new OutputStreamWriter(socket.getOutputStream());
+        // vänta på inkommande anslutningar + skapa en socket för varje anslutning
+        while (true) {
+            Socket clientSocket = serverSocket.accept();
+            clientSockets.add(clientSocket);
+            new Thread(() -> {
+                try {
+                    // Skapa stream för att läsa + skriva data via socket:
+                    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    PrintWriter out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
-                bf = new BufferedReader(in);
-                bw = new BufferedWriter(out);
-
-                while(true) {
-                    String msgFromClient = bf.readLine();
-                    System.out.println("Client: " + msgFromClient);
-
-                    bw.write("MSG Received: " + msgFromClient);
-                    bw.newLine();
-                    bw.flush();
-
-                    if(msgFromClient.equalsIgnoreCase("BYE")) {
-                        break;
+                    // läs in textmeddelanden från chattklienten och skicka till alla andra chattklienter
+                    while (true) {
+                        String message = in.readLine();
+                        if (message == null) {
+                            break;
+                        }
+                        for (Socket socket : clientSockets) {
+                            if (socket != clientSocket) {
+                                out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+                                out.println(message);
+                                out.flush();
+                            }
+                        }
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                socket.close(); in.close(); out.close(); bf.close(); bw.close();
-
-            } catch (IOException e){
-                e.printStackTrace();
-            }
+            }).start();
         }
     }
 }
