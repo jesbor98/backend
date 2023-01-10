@@ -102,7 +102,7 @@ public class Client {
         System.out.println("Enter username for the chat: ");
         String username = scanner.nextLine();
         //1st: IP-adress to connect to, 2nd: port to connect to
-        Socket socket = new Socket("localhost", 1999);
+        Socket socket = new Socket("localhost", 2000);
 
         Client client = new Client(socket, username);
         client.listenForMessage();
