@@ -47,7 +47,7 @@ public class Client {
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
             String message = userInput.readLine();
-            if (message.equals("quit")) {
+            if (message.equals("exit")) {
                 break;
             }
             out.println(message);
