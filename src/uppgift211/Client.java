@@ -20,15 +20,15 @@ public class Client {
             port = Integer.parseInt(args[1]);
         }
 
-        //Socket + anslut till server:
+        //Socket connecting to server
         Socket socket = new Socket(host, port);
         System.out.println("Connection with server established.");
 
-        // Streams f.a. läsa/skriva till servern:
+        //Streams to read/write to server:
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-        // Skapa en tråd för att ta emot textmeddelanden från chattservern
+        //Thread for receiving textmessages from chattserver
         new Thread(() -> {
             try {
                 while (true) {
@@ -43,7 +43,7 @@ public class Client {
             }
         }).start();
 
-        //loop fa läsa in textmeddelanden från användaren och skicka till chattservern
+        //Read textmessages from users to then send to other clients connected to server
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
             String message = userInput.readLine();
@@ -54,7 +54,7 @@ public class Client {
             out.flush();
         }
 
-        // Stäng socketen + streamerna
+        //Close sockets and streams
         socket.close();
         in.close();
         out.close();
