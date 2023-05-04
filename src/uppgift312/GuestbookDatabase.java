@@ -1,67 +1,49 @@
 package uppgift312;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GuestbookDatabase {
-    private Connection conn;
+    private static final String URL = "jdbc:mysql://localhost:3306/guestbook";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "password";
 
-    public GuestbookDatabase(String url, String user, String password) throws SQLException {
-        conn = DriverManager.getConnection(url, user, password);
-        createTable();
+    private Connection connection;
+
+    public GuestbookDatabase() throws SQLException {
+        connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
 
-    private void createTable() throws SQLException {
-        try (Statement stmt = conn.createStatement()) {
-            String sql = "CREATE TABLE IF NOT EXISTS guestbook_entries (id INT NOT NULL AUTO_INCREMENT, name VARCHAR(255), email VARCHAR(255), website VARCHAR(255), comment TEXT, PRIMARY KEY (id))";
-            stmt.executeUpdate(sql);
-        }
+    public void addEntry(GuestbookEntry entry) throws SQLException {
+        String sql = "INSERT INTO entries (name, email, website, comment) VALUES (?, ?, ?, ?)";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, entry.getName());
+        statement.setString(2, entry.getEmail());
+        statement.setString(3, entry.getWebsite());
+        statement.setString(4, entry.getComment());
+        statement.executeUpdate();
     }
 
-    public List<Guestbook> getAllEntries() throws SQLException {
-        List<Guestbook> entries = new ArrayList<>();
-        try (Statement stmt = conn.createStatement()) {
-            String sql = "SELECT * FROM guestbook_entries ORDER BY id DESC";
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                Guestbook entry = new Guestbook(rs.getString("name"), rs.getString("email"), rs.getString("website"), rs.getString("comment"));
-                entries.add(entry);
-            }
-        }
-        return entries;
-    }
+    public String getEntries() throws SQLException {
+        String sql = "SELECT * FROM entries ORDER BY created_at DESC";
+        Statement statement = connection.createStatement();
+        ResultSet result = statement.executeQuery(sql);
 
-    public void addEntry(Guestbook entry) throws SQLException {
-        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO guestbook_entries (name, email, website, comment) VALUES (?, ?, ?, ?)")) {
-            stmt.setString(1, entry.getName());
-            stmt.setString(2, entry.getEmail());
-            stmt.setString(3, entry.getWebsite());
-            stmt.setString(4, entry.getComment());
-            stmt.executeUpdate();
+        StringBuilder entries = new StringBuilder();
+        while (result.next()) {
+            int id = result.getInt("id");
+            String name = result.getString("name");
+            String email = result.getString("email");
+            String website = result.getString("website");
+            String comment = result.getString("comment");
+            String created_at = result.getString("created_at");
+            entries.append(name).append(" (").append(email).append(")").append(" wrote:\n");
+            entries.append(comment).append("\n");
+            entries.append("Posted on ").append(created_at).append("\n\n");
         }
-    }
-
-    public void updateEntry(int id, Guestbook entry) throws SQLException {
-        try (PreparedStatement stmt = conn.prepareStatement("UPDATE guestbook_entries SET name=?, email=?, website=?, comment=? WHERE id=?")) {
-            stmt.setString(1, entry.getName());
-            stmt.setString(2, entry.getEmail());
-            stmt.setString(3, entry.getWebsite());
-            stmt.setString(4, entry.getComment());
-            stmt.setInt(5, id);
-            stmt.executeUpdate();
-        }
-    }
-
-    public void deleteEntry(int id) throws SQLException {
-        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM guestbook_entries WHERE id=?")) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-        }
+        return entries.toString();
     }
 
     public void close() throws SQLException {
-        conn.close();
+        connection.close();
     }
 }
-
