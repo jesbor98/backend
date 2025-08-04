@@ -1,6 +1,3 @@
-IPROG
-Course at Stockholm University. 
-
 Supporting technologies (e.g., multithreading and automatic documentation)
 Low-level connections (stream, datagram, multicast, and raw sockets) to arbitrary servers
 High-level connections to specific servers (e.g., email, web, and database servers)
